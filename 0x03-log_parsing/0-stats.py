@@ -17,21 +17,23 @@ def print_stats():
 
 try:
     for line in sys.stdin:
-        parts = line.split()
-        if len(parts) < 7:
-            continue
+        # Strip and split the line to ensure consistent format
+        line = line.strip().split()
+        if len(line) < 7:
+            continue  # Skip lines that don't match the expected format
 
         # Extract file size and status code
         try:
-            file_size = int(parts[-1])
-            status_code = int(parts[-2])
-            total_size += file_size
+            file_size = int(line[-1])
+            status_code = int(line[-2])
+            total_size += file_size  # Add to total file size
             if status_code in status_codes:
+                # Increment count for the status code
                 status_codes[status_code] += 1
         except ValueError:
-            continue
+            continue  # Skip lines with invalid integers
 
-        # Increment line count and check if we need to print
+        # Increment line count and print stats every 10 lines
         line_count += 1
         if line_count % 10 == 0:
             print_stats()
@@ -39,5 +41,5 @@ try:
 except KeyboardInterrupt:
     pass
 finally:
-    # Print final stats on program exit or interrupt
+    # Print final stats on exit or interrupt
     print_stats()
