@@ -3,6 +3,7 @@
 Module to calculate the perimeter of an island in a grid.
 """
 
+
 def island_perimeter(grid):
     """
     Returns the perimeter of the island described in the grid.
@@ -13,6 +14,7 @@ def island_perimeter(grid):
     Returns:
         int: The perimeter of the island.
     """
+
     rows = len(grid)
     cols = len(grid[0])
     perimeter = 0
@@ -35,4 +37,3 @@ def island_perimeter(grid):
                     perimeter += 1
 
     return perimeter
-
