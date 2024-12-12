@@ -1,55 +1,102 @@
 #!/usr/bin/python3
+"""
+Solution to the Prime Game problem.
+
+This module implements the isWinner function which determines the winner
+of a game where players take turns removing prime numbers and their multiples
+from a set of consecutive integers.
+"""
+
+def is_prime(n):
+    """
+    Check if a number is prime.
+    
+    Args:
+        n (int): Number to check for primality
+    
+    Returns:
+        bool: True if the number is prime, False otherwise
+    """
+    if n < 2:
+        return False
+    
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    
+    return True
+
+def remove_multiples(nums, prime):
+    """
+    Remove a prime number and its multiples from the set.
+    
+    Args:
+        nums (list): Current set of numbers
+        prime (int): Prime number to remove
+    
+    Returns:
+        list: Updated set of numbers
+    """
+    return [num for num in nums if num % prime != 0]
+
+def play_game(n):
+    """
+    Simulate a single round of the prime game.
+    
+    Args:
+        n (int): Maximum number in the set
+    
+    Returns:
+        str: Winner of the game ('Maria' or 'Ben')
+    """
+    # Initialize the game
+    nums = list(range(1, n + 1))
+    current_player = 'Maria'
+    
+    while True:
+        # Find the list of primes in the current set
+        primes = [num for num in nums if is_prime(num)]
+        
+        # If no primes remain, current player loses
+        if not primes:
+            return 'Ben' if current_player == 'Maria' else 'Maria'
+        
+        # Remove the smallest prime and its multiples
+        prime_to_remove = min(primes)
+        nums = remove_multiples(nums, prime_to_remove)
+        
+        # Switch players
+        current_player = 'Ben' if current_player == 'Maria' else 'Maria'
+
 def isWinner(x, nums):
-    """Determine the winner of the Prime Game."""
-    if x < 1 or not nums:
+    """
+    Determine the winner of multiple rounds of the prime game.
+    
+    Args:
+        x (int): Number of rounds
+        nums (list): Maximum numbers for each round
+    
+    Returns:
+        str: Name of the player who won the most rounds
+    """
+    if not nums or x <= 0:
         return None
-
-    max_n = max(nums)
-    primes = sieve_of_eratosthenes(max_n)
-    wins = {"Maria": 0, "Ben": 0}
-
+    
+    # Play each round and track wins
+    maria_wins = 0
+    ben_wins = 0
+    
     for n in nums:
-        if play_game(n, primes):
-            wins["Maria"] += 1
+        winner = play_game(n)
+        if winner == 'Maria':
+            maria_wins += 1
         else:
-            wins["Ben"] += 1
-
-    if wins["Maria"] > wins["Ben"]:
-        return "Maria"
-    elif wins["Maria"] < wins["Ben"]:
-        return "Ben"
+            ben_wins += 1
+    
+    # Determine overall winner
+    if maria_wins > ben_wins:
+        return 'Maria'
+    elif ben_wins > maria_wins:
+        return 'Ben'
     else:
         return None
-
-
-def sieve_of_eratosthenes(max_n):
-    """Compute a list of prime indicators up to max_n using Sieve of Eratosthenes."""
-    primes = [True] * (max_n + 1)
-    primes[0] = primes[1] = False  # 0 and 1 are not prime numbers
-
-    for i in range(2, int(max_n**0.5) + 1):
-        if primes[i]:
-            for j in range(i * i, max_n + 1, i):
-                primes[j] = False
-
-    return primes
-
-
-def play_game(n, primes):
-    """Simulate the game for a given n and return True if Maria wins, False otherwise."""
-    remaining_numbers = set(range(1, n + 1))
-    maria_turn = True
-
-    while True:
-        # Find the next available prime
-        next_prime = next(
-            (num for num in remaining_numbers if primes[num]), None)
-        if next_prime is None:
-            return not maria_turn  # The player who cannot move loses
-
-        # Remove the prime and its multiples
-        to_remove = set(range(next_prime, n + 1, next_prime))
-        remaining_numbers -= to_remove
-
-        # Switch turn
-        maria_turn = not maria_turn
